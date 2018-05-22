@@ -7,8 +7,14 @@ Introduction goes here.
 
 1. Add this extension to your Gemfile with this line:
   ```ruby
-  gem 'spree_pagos_net', github: '[your-github-handle]/spree_pagos_net'
+  gem 'spree_pagos_net', github: 'codetail-io/spree_pagos_net'
   ```
+  cuando esta en forma local
+  ```ruby
+  gem 'spree_pagos_net', path: '../spree_pagos_net'
+  ```
+
+
 
 2. Install the gem using Bundler:
   ```ruby
