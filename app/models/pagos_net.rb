@@ -1,5 +1,16 @@
 class PagosNet
   attr_accessor :shopping_cart
+  URL_PAGOSNET = 'http://test.sintesis.com.bo/WSApp-war/ComelecWS?WSDL'
+  COMPANY_CODE = 109
+  USER_NAME = 'wsOPtushop'
+  PASSWORD = 'Tushop2017'
+
+  # PAGOS NET IFRAME TARJETA DE CREDITO
+  URL_PAGOSNET_CREDITCARD = 'https://test.sintesis.com.bo/payment/#/pay'
+  NRO_CLIENT = 68
+  ENTIDAD = 115
+  KEY_AUTHENTICATE = 'JEn1jJsD5hFrip4jzHODyA=='
+
 
   NEW_TRANSACTION = 'A'
   CHANGE_TRANSACTION = 'M'
@@ -95,7 +106,7 @@ class PagosNet
     fecha = I18n.l Time.zone.today, format: :pagos_net_day
     time = I18n.l Time.zone.now, format: :pagos_net_hour
 
-    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    client = Savon.client(wsdl: URL_PAGOSNET)
     response = client.call(:registro_plan,
                            message: {
                                datos: {
@@ -130,7 +141,7 @@ class PagosNet
   end
 
   def sent_request_items_pagosnet(transaction_id, amount)
-    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    client = Savon.client(wsdl: URL_PAGOSNET)
 
     items_registro_pagosnet = @shopping_cart.pagos_net_items(amount)
 
@@ -140,8 +151,8 @@ class PagosNet
                                        id_transaccion: transaction_id,
                                        numero_pago: 1,
                                        items: items_registro_pagosnet },
-                               cuenta: ENV['USER_NAME'],
-                               password: ENV['PASSWORD']
+                               cuenta: USER_NAME,
+                               password: PASSWORD
                            })
     puts '>>>>>>>>>> REGISTRAR ITEM PAGOS NET'
     puts response.body
@@ -166,7 +177,7 @@ class PagosNet
     fecha = I18n.l Time.zone.today, format: :pagos_net_day
     time = I18n.l Time.zone.now, format: :pagos_net_hour
 
-    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    client = Savon.client(wsdl: URL_PAGOSNET)
     response = client.call(:registro_plan,
                            message: {
                                datos: {
@@ -193,8 +204,8 @@ class PagosNet
                                        nit_factura: opt[:user_ci]
                                    }
                                },
-                               cuenta: ENV['USER_NAME'],
-                               password: ENV['PASSWORD']
+                               cuenta: USER_NAME,
+                               password: PASSWORD
                            })
     return [response, amount, codigo_recaudacion]
     # return [(response.body[:registro_plan_response][:return][:codigo_error] == '0'),
@@ -202,7 +213,7 @@ class PagosNet
   end
 
   def request_pagosnet_tarjeta
-    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    client = Savon.client(wsdl: URL_PAGOSNET)
     response = client.call(:registro_tarjeta_habiente,
                            message: {
                                datos: {
@@ -217,8 +228,8 @@ class PagosNet
                                    telefono: user_nro_telf,
                                    transaccion: NEW_TRANSACTION
                                },
-                               cuenta: ENV['USER_NAME'],
-                               password: ENV['PASSWORD']
+                               cuenta: USER_NAME,
+                               password: PASSWORD
                            })
     puts '>>>>>>> PAGOSNET TARJETA'
     puts response
@@ -236,7 +247,7 @@ class PagosNet
     fecha = I18n.l Time.zone.today, format: :pagos_net_day
     time = I18n.l Time.zone.now, format: :pagos_net_hour
 
-    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    client = Savon.client(wsdl: URL_PAGOSNET)
     response = client.call(:registro_plan,
                            message: {
                                datos: {
@@ -263,8 +274,8 @@ class PagosNet
                                        nit_factura: user_ci
                                    }
                                },
-                               cuenta: ENV['USER_NAME'],
-                               password: ENV['PASSWORD']
+                               cuenta: USER_NAME,
+                               password: PASSWORD
                            })
 
     return response
