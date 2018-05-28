@@ -5,6 +5,7 @@ module Spree
 
     # callbacks from pagosnet server
     def update
+      debugger
     #   @payment_method = PaymentMethod.find params[:payment_method_id]
     #   data = JSON.parse Base64.strict_decode64 params[:data]
     #   render text: "Bad signature\n", status: 401 and return unless @payment_method.check_signature params[:data], params[:signature]

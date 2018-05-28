@@ -3,14 +3,14 @@ module Spree
     preference :server, :string, default: 'https://www.liqpay.com'
     preference :public_key, :string, default: ''
     preference :private_key, :string, default: ''
-    preference :order_description, :string, default: -> {Spree::Store.current.name}
+    preference :order_description, :string, default: -> { Spree::Store.current.name }
     preference :test_mode, :boolean, default: true
     def provider_class
       ActiveMerchant::Billing::PagosNet
     end
 
     def provider
-      @provider ||= provider_class.new
+      @provider ||= provider_class.new(preferred_public_key, preferred_private_key)
     end
 
     def source_required?
@@ -21,7 +21,7 @@ module Spree
       "#{preferred_server}/api/checkout"
     end
 
-    def cnb_form_fields order, result_url, server_url
+    def cnb_form_fields(order, result_url, server_url)
       provider.cnb_form_fields amount: order.total,
                                currency: order.currency,
                                description: preferred_order_description,
@@ -31,7 +31,7 @@ module Spree
                                sandbox: preferred_test_mode ? 1 : 0
     end
 
-    def check_signature data, signature
+    def check_signature(data, signature)
       provider.check_signature data, signature
     end
   end

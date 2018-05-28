@@ -1,4 +1,3 @@
-<div class="well text-right form-buttons" data-hook="buttons">
-  <input type="submit" name="commit" value="Pagar" class="btn btn-success primary" data-disable-with="Pagar">
-  <script>Spree.disableSaveOnClick();</script>
-</div>
+<% payment_method.cnb_form_fields(@order, pagos_net_result_order_checkout_url(@order), pagos_net_update_url(payment_method.id)).each do |name, value| %>
+  <%= hidden_field_tag name, value %>
+<% end %>
