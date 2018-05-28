@@ -1,6 +1,6 @@
 module Spree
   class PaymentMethod::PagosNet < PaymentMethod
-    preference :server, :string, default: 'https://www.liqpay.com'
+    preference :server, :string, default: 'http://localhost:3000'
     preference :public_key, :string, default: ''
     preference :private_key, :string, default: ''
     preference :order_description, :string, default: -> { Spree::Store.current.name }
@@ -18,7 +18,7 @@ module Spree
     end
 
     def checkout_url
-      "#{preferred_server}/api/checkout"
+      "#{preferred_server}/spree/pagos_net"
     end
 
     def cnb_form_fields(order, result_url, server_url)

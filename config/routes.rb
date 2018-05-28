@@ -9,5 +9,5 @@ Spree::Core::Engine.add_routes do
     end
   end
 
-  post '/pagos_net_status/:payment_method_id' => 'pagos_net#update', :as => :pagos_net_update
+  patch '/spree/pagos_net', to: "pagos_net#update", as: :pagos_net_update
 end
