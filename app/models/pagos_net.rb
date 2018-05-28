@@ -1,9 +1,5 @@
 class PagosNet
   attr_accessor :shopping_cart
-  URL_PAGOSNET = 'http://test.sintesis.com.bo/WSApp-war/ComelecWS?WSDL'
-  COMPANY_CODE = 109
-  USER_NAME = 'wsOPtushop'
-  PASSWORD = 'Tushop2017'
 
   # PAGOS NET IFRAME TARJETA DE CREDITO
   URL_PAGOSNET_CREDITCARD = 'https://test.sintesis.com.bo/payment/#/pay'
@@ -19,83 +15,53 @@ class PagosNet
   PRECEDENCIA_COBRO = 'T'
   DESCRIPTION_RECAUDACION = 'Pedido de Importacion de un producto Amazon [Tushop]'
 
-  def initialize(shopping_cart)
-    @shopping_cart = shopping_cart
+  # __________ codigo recaudacion
+  OPTS_DEFAULT = { 'type_transaction' => 'A',
+                   'currency' => 'BS',
+                   'description_recaudacion' => 'Pagar via pagos net',
+                   'precedencia_cobro' => 'T',
+                   'description_planilla' => 'planilla 1' }
+
+  def create_transaction(code_transaction, amount_money, user_data, type_pay, opts = {})
+    params = prepare_payment_params(code_transaction, amount_money, user_data, type_pay, opts)
+    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    resp_registro_plan = client.call(:registro_plan, message: params)
   end
 
-  def shopping_cart_id
-    return @shopping_cart.id
+  def prepare_payment_params(code_transaction, amount_money, user_data, type_pay, opts)
+    opts_final = OPTS_DEFAULT.merge(opts)
+    {
+      datos:
+      {
+        transaccion: opts_final['type_transaction'],
+        nombre_comprador: user_data['fiscal_name'],
+        documento_identidad_comprador: user_data['ci'],
+        codigo_comprador: user_data['id'],
+        fecha: Time.zone.now.strftime('%Y%m%d'),
+        hora: Time.zone.now.strftime('%H%M%S'),
+        correo_electronico: user_data['email'],
+        moneda: opts_final['currency'],
+        codigo_recaudacion: code_transaction,
+        descripcion_recaudacion: opts_final['description_recaudacion'],
+        fecha_vencimiento: 0,
+        hora_vencimiento: 0,
+        categoria_producto: type_pay,
+        precedencia_cobro: opts_final['precedencia_cobro'],
+        planillas:
+        {
+          numero_pago: 1,
+          monto_pago: amount_money.to_f,
+          descripcion: 'Pedido de TuShop',
+          monto_credito_fiscal: amount_money.to_f,
+          nombre_factura: user_data['fiscal_name'],
+          nit_factura: user_data['ci']
+        }
+      },
+      cuenta: ENV['USER_NAME'],
+      password: ENV['PASSWORD']
+    }
   end
-
-  def user_fiscal_full_name
-    return (@shopping_cart.try(:fiscal_data).try(:full_name) || 'No data.')
-  end
-
-  def user_name
-    return (@shopping_cart.user_name || 'No data.')
-  end
-
-  def user_last_name
-    return @shopping_cart.user_last_name
-  end
-
-  def user_ci
-    return (@shopping_cart.try(:fiscal_data).try(:ci_nit) || 'No data.')
-  end
-
-  def user_id
-    return (@shopping_cart.try(:user_id) || 'No data.')
-  end
-
-  def user_email
-    # return (@shopping_cart.try(:user_email) || 'No data.')
-    "clientes#{@shopping_cart.id}@tushopbolivia.com"
-  end
-
-  def user_nro_telf
-    return @shopping_cart.user_nro_telf
-  end
-
-  def user_address
-    return @shopping_cart.user_address
-  end
-
-  def cart_id_transaccion
-    return (@shopping_cart.try(:pagosnet_bill).try(:transaction_id) || 'No data.')
-  end
-
-  def total_price
-    return @shopping_cart.total_price
-  end
-
-  def total_price_boliviano
-    return @shopping_cart.converter_boliviano +
-           @shopping_cart.shipment_price.to_f -
-           (@shopping_cart.coupon.price_off rescue 0)
-    # rescue
-    #   nil
-  end
-
-  def recaudacion_codigo
-    result = (@shopping_cart.recaudacion_codigo)
-
-    return result
-  end
-
-  def code_product
-    result = '1'
-    if pagosnet_creditcard?
-      result = '2'
-    end
-
-    return result
-  end
-
-  def pagosnet_creditcard?
-    @shopping_cart.try(:payment_method).try(:to_sym) == :pagos_net_creditcard
-    # rescue
-    #   return false
-  end
+  # __________ end
 
   def send_request_pagosnet(id_before_recaudacion = nil)
     amount = total_price_boliviano
