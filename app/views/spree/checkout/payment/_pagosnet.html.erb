@@ -1,3 +1,22 @@
-<% debugger %>
 <%= hidden_field_tag "order_id", @order.id %>
 <%= hidden_field_tag "number", @order.number %>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="form-check">
+      <label class="form-check-label">
+        <%= radio_button_tag "type_pagos_net", "cash_payment" %> Pago en efectivo
+      </label>
+    </div>
+    <div class="form-check">
+      <label class="form-check-label">
+        <%= radio_button_tag "type_pagos_net", "credit_cart" %> Tarjeta de credito
+      </label>
+    </div>
+    <div class="form-check">
+      <label class="form-check-label">
+        <%= radio_button_tag "type_pagos_net", "ibaking" %> Ibaking
+      </label>
+    </div>
+  </div>
+
+</div>
