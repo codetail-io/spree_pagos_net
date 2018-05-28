@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'digest/sha1'
 require 'json'
@@ -5,14 +7,13 @@ require 'json'
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class PagosNet < Gateway
-
-      def initialize public_key, private_key
+      def initialize(public_key, private_key)
         @public_key = public_key
         @private_key = private_key
       end
 
-      def cnb_form_fields options
-        params = {version: 3, public_key: @public_key}.merge options
+      def cnb_form_fields(options)
+        params = { version: 3, public_key: @public_key }.merge options
         data = encode params
         {
           data: data,
@@ -20,23 +21,23 @@ module ActiveMerchant #:nodoc:
         }
       end
 
-      def encode data
+      def encode(data)
         encode64 encode_json data
       end
 
-      def encode64 param
+      def encode64(param)
         Base64.strict_encode64 param
       end
 
-      def encode_json params
+      def encode_json(params)
         JSON.generate params
       end
 
-      def encode_signature param
+      def encode_signature(param)
         encode64 Digest::SHA1.digest @private_key + param + @private_key
       end
 
-      def check_signature data, signature
+      def check_signature(data, signature)
         signature == encode_signature(data)
       end
     end

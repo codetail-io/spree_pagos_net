@@ -1,6 +1,10 @@
 module Spree
   class PaymentMethod::PagosNet < PaymentMethod
-
+    preference :server, :string, default: 'https://www.liqpay.com'
+    preference :public_key, :string, default: ''
+    preference :private_key, :string, default: ''
+    preference :order_description, :string, default: -> {Spree::Store.current.name}
+    preference :test_mode, :boolean, default: true
     def provider_class
       ActiveMerchant::Billing::PagosNet
     end
@@ -12,6 +16,7 @@ module Spree
     def source_required?
       false
     end
+
     def checkout_url
       "#{preferred_server}/api/checkout"
     end
