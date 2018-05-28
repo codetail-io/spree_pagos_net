@@ -1,10 +1,13 @@
 module Spree
   class PaymentMethod::PagosNet < PaymentMethod
     preference :server, :string, default: 'http://localhost:3000'
+    preference :account_pagos_net, :string
+    preference :password_pagos_net, :string
     preference :public_key, :string, default: ''
     preference :private_key, :string, default: ''
     preference :order_description, :string, default: -> { Spree::Store.current.name }
     preference :test_mode, :boolean, default: true
+
     def provider_class
       ActiveMerchant::Billing::PagosNet
     end
@@ -28,6 +31,8 @@ module Spree
                                order_id: order.id,
                                result_url: result_url,
                                server_url: server_url,
+                               account_pagos_net: '',
+                               password_pagos_net: '',
                                sandbox: preferred_test_mode ? 1 : 0
     end
 
