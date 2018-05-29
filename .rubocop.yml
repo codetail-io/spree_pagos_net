@@ -1,0 +1,66 @@
+require: rubocop-rspec
+Rails:
+  Enabled: true
+Documentation:
+  Enabled: false
+AllCops:
+  Exclude:
+   - 'db/**/*'
+   - 'bin/*'
+   - 'db/seeds.rb'
+   - 'db/schema.rb'
+   - 'vendor/bundle/**/*'
+   - 'lib/tasks/*.rake'
+   - 'config/**/*'
+   - 'spec/dummy/**/*'
+   - 'spec/spec_helper.rb'
+   - 'lib/spree_pagos_net.rb'
+   - 'lib/spree_pagos_net/version.rb'
+   - 'lib/spree_pagos_net/factories.rb'
+   - 'lib/spree_pagos_net/engine.rb'
+   - 'lib/generators/spree_pagos_net/install/install_generator.rb'
+  TargetRubyVersion: 2.5
+Rails:
+  Enabled: true
+Metrics/LineLength:
+  Max: 100
+StringLiterals:
+  Enabled: false
+Style/NegatedIf:
+  Enabled: false
+Rails/FilePath:
+  Enabled: false
+Rails/InverseOf:
+  Enabled: false
+Metrics/ModuleLength:
+  Exclude:
+    - "**/*_spec.rb"
+    - 'spec/factories/*'
+Metrics/BlockLength:
+  Max: 100
+Style/RedundantReturn:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+Rails/ApplicationRecord:
+  Enabled: false
+Style/SymbolArray:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/RedundantReturn:
+  Enabled: false
+Style/RedundantSelf:
+  Enabled: false
+RSpec/InstanceVariable:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/ExampleLength:
+  Enabled: false
+Rails/HasManyOrHasOneDependent:
+  Enabled: false
+RSpec/EmptyExampleGroup:
+  Enabled: false

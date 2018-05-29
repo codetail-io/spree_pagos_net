@@ -1,7 +1,7 @@
 module Spree
   class PagosNetController < ApplicationController
 
-    # skip_before_filter :verify_authenticity_token
+    skip_before_filter :verify_authenticity_token
 
     # callbacks from pagosnet server
     def update
@@ -20,7 +20,6 @@ module Spree
     #   payment.complete!
     #
     #   render text: "Thank you.\n"
-    # puts
     end
   end
 end
