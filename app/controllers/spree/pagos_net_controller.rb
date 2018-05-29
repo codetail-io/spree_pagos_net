@@ -24,6 +24,7 @@ module Spree
       #   payment.complete!
       #
       #   render text: "Thank you.\n"
+      render
     end
 
     private

@@ -1,3 +1,4 @@
+require 'savon'
 class PagosNet
   attr_accessor :shopping_cart
 
