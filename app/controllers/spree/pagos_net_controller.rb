@@ -6,9 +6,17 @@ module Spree
 
     def update
       pagos_net = PagosNet.new(@payment_method.id)
-      user = @order.user
-      pagos_net.create_transaction(@order.number, @order.total, user, @type_pagos_net)
-      debugger
+      user = { 'id' => @order.user.id,
+               'fiscal_name' => params['name_invoice'],
+               'ci' => params['ci_invoice'],
+               'email' => "user_ts_#{ @order.user.id }@gmail.com"}
+      rspn = pagos_net.create_transaction(@order.number,
+                                          @order.total,
+                                          user,
+                                          @type_pagos_net)
+      rspn_pagosnet = { 'status' => rspn.body[:registro_plan_response][:return][:codigo_error],
+                        'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
+                        'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
       #   @payment_method = PaymentMethod.find params[:payment_method_id]
       #   data = JSON.parse Base64.strict_decode64 params[:data]
       #   render text: "Bad signature\n", status: 401 and return unless @payment_method.check_signature params[:data], params[:signature]
@@ -24,7 +32,6 @@ module Spree
       #   payment.complete!
       #
       #   render text: "Thank you.\n"
-      render
     end
 
     private
@@ -38,7 +45,11 @@ module Spree
     end
 
     def set_type_pagos_net
-      @type_pagos_net = params['type_pagos_net']
+      @type_pagos_net = if params['type_pagos_net'] == 'credit_cart'
+                          '2'
+                        else
+                          '1'
+                        end
     end
   end
 end
