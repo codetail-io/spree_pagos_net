@@ -22,9 +22,16 @@ class PagosNet
                    'precedencia_cobro' => 'T',
                    'description_planilla' => 'planilla 1' }
 
+  def initialize(payment_method_id = nil)
+    payment_method = Spree::PaymentMethod.find(payment_method_id)
+    @user_name_pagos_net = payment_method['preferences'][:account_pagos_net] rescue ''
+    @password_pagos_net = payment_method['preferences'][:password_pagos_net] rescue ''
+    @soap_url = payment_method['preferences'][:soap_url_pagos_net] rescue ''
+  end
+
   def create_transaction(code_transaction, amount_money, user_data, type_pay, opts = {})
     params = prepare_payment_params(code_transaction, amount_money, user_data, type_pay, opts)
-    client = Savon.client(wsdl: ENV['URL_PAGOSNET'])
+    client = Savon.client(wsdl: @soap_url)
     resp_registro_plan = client.call(:registro_plan, message: params)
   end
 
@@ -57,8 +64,8 @@ class PagosNet
           nit_factura: user_data['ci']
         }
       },
-      cuenta: ENV['USER_NAME'],
-      password: ENV['PASSWORD']
+      cuenta: @user_name_pagos_net,
+      password: @password_pagos_net
     }
   end
   # __________ end
@@ -72,35 +79,35 @@ class PagosNet
     fecha = I18n.l Time.zone.today, format: :pagos_net_day
     time = I18n.l Time.zone.now, format: :pagos_net_hour
 
-    client = Savon.client(wsdl: URL_PAGOSNET)
+    client = Savon.client(wsdl: @soap_url)
     response = client.call(:registro_plan,
                            message: {
-                               datos: {
-                                   transaccion: NEW_TRANSACTION,
-                                   nombre_comprador: user_fiscal_full_name,
-                                   documento_identidad_comprador: user_ci,
-                                   codigo_comprador: user_id,
-                                   fecha: fecha,
-                                   hora: time,
-                                   correo_electronico: user_email,
-                                   moneda: TYPE_CURRENCY,
-                                   codigo_recaudacion: codigo_recaudacion,
-                                   descripcion_recaudacion: DESCRIPTION_RECAUDACION,
-                                   fecha_vencimiento: 0,
-                                   hora_vencimiento: 0,
-                                   categoria_producto: codigo_producto,
-                                   precedencia_cobro: PRECEDENCIA_COBRO,
-                                   planillas: {
-                                       numero_pago: 1,
-                                       monto_pago: amount,
-                                       descripcion: 'Pedido de TuShop',
-                                       monto_credito_fiscal: credito_fiscal,
-                                       nombre_factura: user_fiscal_full_name,
-                                       nit_factura: user_ci
-                                   }
-                               },
-                               cuenta: ENV['USER_NAME'],
-                               password: ENV['PASSWORD']
+                             datos: {
+                               transaccion: NEW_TRANSACTION,
+                               nombre_comprador: user_fiscal_full_name,
+                               documento_identidad_comprador: user_ci,
+                               codigo_comprador: user_id,
+                               fecha: fecha,
+                               hora: time,
+                               correo_electronico: user_email,
+                               moneda: TYPE_CURRENCY,
+                               codigo_recaudacion: codigo_recaudacion,
+                               descripcion_recaudacion: DESCRIPTION_RECAUDACION,
+                               fecha_vencimiento: 0,
+                               hora_vencimiento: 0,
+                               categoria_producto: codigo_producto,
+                               precedencia_cobro: PRECEDENCIA_COBRO,
+                               planillas: {
+                                   numero_pago: 1,
+                                   monto_pago: amount,
+                                   descripcion: 'Pedido de TuShop',
+                                   monto_credito_fiscal: credito_fiscal,
+                                   nombre_factura: user_fiscal_full_name,
+                                   nit_factura: user_ci
+                                 }
+                             },
+                             cuenta: @user_name_pagos_net,
+                             password: @user_name_pagos_net
                            })
 
     return [response, amount, codigo_recaudacion]
@@ -113,20 +120,20 @@ class PagosNet
 
     response = client.call(:registro_item,
                            message: {
-                               datos: { transaccion: NEW_TRANSACTION,
-                                       id_transaccion: transaction_id,
-                                       numero_pago: 1,
-                                       items: items_registro_pagosnet },
-                               cuenta: USER_NAME,
-                               password: PASSWORD
+                             datos: { transaccion: NEW_TRANSACTION,
+                                      id_transaccion: transaction_id,
+                                      numero_pago: 1,
+                                      items: items_registro_pagosnet },
+                             cuenta: USER_NAME,
+                             password: PASSWORD
                            })
-    puts '>>>>>>>>>> REGISTRAR ITEM PAGOS NET'
-    puts response.body
-    puts '<<<<<<<<<< END PAGOS NET'
+    logger.info ">>>>>>>>>> REGISTRAR ITEM PAGOS NET"
+    logger.info response.body
+    logger.info "<<<<<<<<<< END PAGOS NET"
   rescue => e
-    puts '>>>>>>>>>> REGISTRAR ITEM PAGOS NET'
-    puts e.message
-    puts '<<<<<<<<<< END PAGOS NET'
+    logger.info '>>>>>>>>>> REGISTRAR ITEM PAGOS NET'
+    logger.info e.message
+    logger.info '<<<<<<<<<< END PAGOS NET'
   end
 
   def modify_request_pagosnet(options = {})
@@ -143,35 +150,35 @@ class PagosNet
     fecha = I18n.l Time.zone.today, format: :pagos_net_day
     time = I18n.l Time.zone.now, format: :pagos_net_hour
 
-    client = Savon.client(wsdl: URL_PAGOSNET)
+    client = Savon.client(wsdl: @soap_url)
     response = client.call(:registro_plan,
                            message: {
-                               datos: {
-                                   transaccion: CHANGE_TRANSACTION,
-                                   nombre_comprador: opt[:user_name],
-                                   documento_identidad_comprador: opt[:user_ci],
-                                   codigo_comprador: opt[:user_id],
-                                   fecha: fecha,
-                                   hora: time,
-                                   correo_electronico: opt[:user_email],
-                                   moneda: TYPE_CURRENCY,
-                                   codigo_recaudacion: codigo_recaudacion,
-                                   descripcion_recaudacion: DESCRIPTION_RECAUDACION,
-                                   fecha_vencimiento: 0,
-                                   hora_vencimiento: 0,
-                                   categoria_producto: opt[:code_product],
-                                   precedencia_cobro: PRECEDENCIA_COBRO,
-                                   planillas: {
-                                       numero_pago: 1,
-                                       monto_pago: amount,
-                                       descripcion: 'Pedido de TuShop',
-                                       monto_credito_fiscal: credito_fiscal,
-                                       nombre_factura: opt[:user_name],
-                                       nit_factura: opt[:user_ci]
-                                   }
-                               },
-                               cuenta: USER_NAME,
-                               password: PASSWORD
+                             datos: {
+                               transaccion: CHANGE_TRANSACTION,
+                               nombre_comprador: opt[:user_name],
+                               documento_identidad_comprador: opt[:user_ci],
+                               codigo_comprador: opt[:user_id],
+                               fecha: fecha,
+                               hora: time,
+                               correo_electronico: opt[:user_email],
+                               moneda: TYPE_CURRENCY,
+                               codigo_recaudacion: codigo_recaudacion,
+                               descripcion_recaudacion: DESCRIPTION_RECAUDACION,
+                               fecha_vencimiento: 0,
+                               hora_vencimiento: 0,
+                               categoria_producto: opt[:code_product],
+                               precedencia_cobro: PRECEDENCIA_COBRO,
+                               planillas: {
+                                   numero_pago: 1,
+                                   monto_pago: amount,
+                                   descripcion: 'Pedido de TuShop',
+                                   monto_credito_fiscal: credito_fiscal,
+                                   nombre_factura: opt[:user_name],
+                                   nit_factura: opt[:user_ci]
+                                 }
+                             },
+                             cuenta: @user_name_pagos_net,
+                             password: @password_pagos_net
                            })
     return [response, amount, codigo_recaudacion]
     # return [(response.body[:registro_plan_response][:return][:codigo_error] == '0'),
@@ -179,27 +186,27 @@ class PagosNet
   end
 
   def request_pagosnet_tarjeta
-    client = Savon.client(wsdl: URL_PAGOSNET)
+    client = Savon.client(wsdl: @soap_url)
     response = client.call(:registro_tarjeta_habiente,
                            message: {
-                               datos: {
-                                   apellido: user_last_name,
-                                   ciudad: 'La Paz',
-                                   correo_electronico: user_email,
-                                   departamento: 'La Paz',
-                                   direccion: 'No data.',
-                                   id_transaccion: cart_id_transaccion,
-                                   nombre: user_name,
-                                   pais: 'Bolivia',
-                                   telefono: user_nro_telf,
-                                   transaccion: NEW_TRANSACTION
-                               },
-                               cuenta: USER_NAME,
-                               password: PASSWORD
+                             datos: {
+                               apellido: user_last_name,
+                               ciudad: 'La Paz',
+                               correo_electronico: user_email,
+                               departamento: 'La Paz',
+                               direccion: 'No data.',
+                               id_transaccion: cart_id_transaccion,
+                               nombre: user_name,
+                               pais: 'Bolivia',
+                               telefono: user_nro_telf,
+                               transaccion: NEW_TRANSACTION
+                             },
+                             cuenta: @user_name_pagos_net,
+                             password: @password_pagos_net
                            })
-    puts '>>>>>>> PAGOSNET TARJETA'
-    puts response
-    puts '<<<<<<< END TARJETA'
+    logger.info '>>>>>>> PAGOSNET TARJETA'
+    logger.info response
+    logger.info '<<<<<<< END TARJETA'
     return response
   end
 
@@ -213,35 +220,35 @@ class PagosNet
     fecha = I18n.l Time.zone.today, format: :pagos_net_day
     time = I18n.l Time.zone.now, format: :pagos_net_hour
 
-    client = Savon.client(wsdl: URL_PAGOSNET)
+    client = Savon.client(wsdl: @soap_url)
     response = client.call(:registro_plan,
                            message: {
-                               datos: {
-                                   transaccion: DESTROY_TRANSACTION,
-                                   nombre_comprador: user_name,
-                                   documento_identidad_comprador: user_ci,
-                                   codigo_comprador: user_id,
-                                   fecha: fecha,
-                                   hora: time,
-                                   correo_electronico: user_email,
-                                   moneda: TYPE_CURRENCY,
-                                   codigo_recaudacion: codigo_recaudacion,
-                                   descripcion_recaudacion: DESCRIPTION_RECAUDACION,
-                                   fecha_vencimiento: 0,
-                                   hora_vencimiento: 0,
-                                   categoria_producto: codigo_producto,
-                                   precedencia_cobro: PRECEDENCIA_COBRO,
-                                   planillas: {
-                                       numero_pago: 1,
-                                       monto_pago: amount,
-                                       descripcion: 'Pedido de TuShop',
-                                       monto_credito_fiscal: credito_fiscal,
-                                       nombre_factura: user_name,
-                                       nit_factura: user_ci
-                                   }
-                               },
-                               cuenta: USER_NAME,
-                               password: PASSWORD
+                             datos: {
+                               transaccion: DESTROY_TRANSACTION,
+                               nombre_comprador: user_name,
+                               documento_identidad_comprador: user_ci,
+                               codigo_comprador: user_id,
+                               fecha: fecha,
+                               hora: time,
+                               correo_electronico: user_email,
+                               moneda: TYPE_CURRENCY,
+                               codigo_recaudacion: codigo_recaudacion,
+                               descripcion_recaudacion: DESCRIPTION_RECAUDACION,
+                               fecha_vencimiento: 0,
+                               hora_vencimiento: 0,
+                               categoria_producto: codigo_producto,
+                               precedencia_cobro: PRECEDENCIA_COBRO,
+                               planillas: {
+                                   numero_pago: 1,
+                                   monto_pago: amount,
+                                   descripcion: 'Pedido de TuShop',
+                                   monto_credito_fiscal: credito_fiscal,
+                                   nombre_factura: user_name,
+                                   nit_factura: user_ci
+                                 }
+                             },
+                             cuenta: USER_NAME,
+                             password: PASSWORD
                            })
 
     return response

@@ -68,3 +68,7 @@ Rails/Delegate:
   Enabled: false
 AbcSize:
   Enabled: false
+Style/RescueModifier:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false

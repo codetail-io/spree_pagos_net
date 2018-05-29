@@ -7,7 +7,8 @@ module Spree
     preference :private_key, :string, default: ''
     preference :order_description, :string, default: -> { Spree::Store.current.name }
     preference :test_mode, :boolean, default: true
-
+    preference :soap_url_pagos_net, :string, default: 'http://test.sintesis.com.bo/WSApp-war/ComelecWS?WSDL'
+    preference :company_code_pagos_net, :string, default: '109'
     def provider_class
       ActiveMerchant::Billing::PagosNet
     end
