@@ -19,23 +19,23 @@ module Spree
                           'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
-        if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
-          @order.temporary_address = !params[:save_user_address]
-          @order.payments.last.started_processing
-          if @order.completed?
-            @current_order = nil
-            flash.notice = Spree.t(:order_processed_successfully)
-            flash['order_completed'] = true
-            redirect_to completion_route
+        if rspn_pagosnet['status'].to_i.zero?
+          if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
+            @order.temporary_address = !params[:save_user_address]
+            @order.payments.last.started_processing
+            if @order.completed?
+              @current_order = nil
+              flash.notice = Spree.t(:order_processed_successfully)
+              flash['order_completed'] = true
+              redirect_to completion_route
+            else
+              @order.completed_at = Time.new.zone
+              @order.save!
+              redirect_to completion_route
+            end
           else
-            @current_order = nil
-            @order.completed_at = Time.new.zone
-            @order.update!
-            redirect_to completion_route
-            # redirect_to checkout_state_path(@order.state)
+            render :edit
           end
-        else
-          render :edit
         end
       else
         if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
@@ -57,7 +57,6 @@ module Spree
           render :edit
         end
       end
-
     end
 
     private
@@ -71,6 +70,7 @@ module Spree
                           end
                         end
     end
+
     def set_payment_method_net
       @payment_method_p = PaymentMethod.find(params['order']['payments_attributes'][0]['payment_method_id']) rescue nil
     end
