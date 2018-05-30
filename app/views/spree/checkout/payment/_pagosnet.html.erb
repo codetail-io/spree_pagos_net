@@ -1,15 +1,15 @@
-<script>
-    $(function() {
-        var checkout_form = $('#checkout_form_payment');
-        var checkout_form_action = checkout_form.prop('action');
-        var radio = $('#order_payments_attributes__payment_method_id_<%= payment_method.id %>')
-        var change_submit_url = function() {
-            checkout_form.prop('action', radio.prop('checked') ? '<%= payment_method.checkout_url %>' : checkout_form_action);
-        };
-        $('input[type=radio][name="order[payments_attributes][][payment_method_id]"]', checkout_form).change(change_submit_url);
-        change_submit_url();
-    })
-</script>
+# <script>
+#     $(function() {
+#         var checkout_form = $('#checkout_form_payment');
+#         var checkout_form_action = checkout_form.prop('action');
+#         var radio = $('#order_payments_attributes__payment_method_id_<%= payment_method.id %>')
+#         var change_submit_url = function() {
+#             checkout_form.prop('action', radio.prop('checked') ? '<%= payment_method.checkout_url %>' : checkout_form_action);
+#         };
+#         $('input[type=radio][name="order[payments_attributes][][payment_method_id]"]', checkout_form).change(change_submit_url);
+#         change_submit_url();
+#     })
+# </script>
 <% pagos_net_update_url(payment_method.id) %>
 <%= hidden_field_tag "order_id", @order.id %>
 <%= hidden_field_tag "number", @order.number %>
