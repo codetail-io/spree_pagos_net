@@ -19,26 +19,45 @@ module Spree
                           'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
-      end
-      debugger
-      if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
-        @order.temporary_address = !params[:save_user_address]
-        unless @order.next
-          flash[:error] = @order.errors.full_messages.join("\n")
-          redirect_to(checkout_state_path(@order.state)) && return
-        end
-
-        if @order.completed?
-          @current_order = nil
-          flash.notice = Spree.t(:order_processed_successfully)
-          flash['order_completed'] = true
-          redirect_to completion_route
+        if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
+          @order.temporary_address = !params[:save_user_address]
+          @order.payments.last.started_processing
+          if @order.completed?
+            @current_order = nil
+            flash.notice = Spree.t(:order_processed_successfully)
+            flash['order_completed'] = true
+            redirect_to completion_route
+          else
+            @current_order = nil
+            @order.completed_at = Time.new.zone
+            @order.update!
+            redirect_to completion_route
+            # redirect_to checkout_state_path(@order.state)
+          end
         else
-          redirect_to checkout_state_path(@order.state)
+          render :edit
         end
       else
-        render :edit
+        if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
+          @order.temporary_address = !params[:save_user_address]
+          unless @order.next
+            flash[:error] = @order.errors.full_messages.join("\n")
+            redirect_to(checkout_state_path(@order.state)) && return
+          end
+
+          if @order.completed?
+            @current_order = nil
+            flash.notice = Spree.t(:order_processed_successfully)
+            flash['order_completed'] = true
+            redirect_to completion_route
+          else
+            redirect_to checkout_state_path(@order.state)
+          end
+        else
+          render :edit
+        end
       end
+
     end
 
     private
