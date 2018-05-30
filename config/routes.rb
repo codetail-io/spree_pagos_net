@@ -10,5 +10,5 @@ Spree::Core::Engine.add_routes do
   end
   patch '/spree/pagos_net', to: "pagos_net#update", as: :pagos_net_update
 end
-get '/tushop_webservice/action.WSDL', to: redirect('/tushop_webservice/action')
+# get '/tushop_webservice/action.WSDL', to: redirect('/tushop_webservice/action')
 wash_out :tushop_webservice
