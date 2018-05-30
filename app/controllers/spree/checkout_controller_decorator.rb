@@ -20,6 +20,7 @@ module Spree
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
       end
+      debugger
       if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
         @order.temporary_address = !params[:save_user_address]
         unless @order.next
@@ -51,7 +52,6 @@ module Spree
                           end
                         end
     end
-    
     def set_payment_method_net
       @payment_method_p = PaymentMethod.find(params['order']['payments_attributes'][0]['payment_method_id']) rescue nil
     end
