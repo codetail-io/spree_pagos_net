@@ -22,7 +22,6 @@ module Spree
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
         @message_pn = rspn_pagosnet['message']
-        redirect_to controller: 'pagos_net', action: 'credit_card', id: @order.id
         if rspn_pagosnet['status'].to_i.zero?
           @order.pagos_net_bill.create(transaction_id: rspn_pagosnet['id_transaccion'],
                                        code_recaudacion: @order.number,
@@ -43,7 +42,8 @@ module Spree
               if @type_pagos_net == 2
                 redirect_to controller: 'pagos_net', action: 'credit_card', id: @order.id
               else
-                redirect_to completion_route
+                # redirect_to completion_route
+                redirect_to controller: 'pagos_net', action: 'cash_payment', id: @order.id
               end
             end
           else
