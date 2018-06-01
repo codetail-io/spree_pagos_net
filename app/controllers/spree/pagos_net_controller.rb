@@ -1,5 +1,5 @@
 module Spree
-  class PagosNetController < ApplicationController
+  class PagosNetController < Spree::OrdersController
     def credit_card
       render 'spree/pagos_net/index'
     end

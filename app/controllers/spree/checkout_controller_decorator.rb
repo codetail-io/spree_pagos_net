@@ -20,7 +20,6 @@ module Spree
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
         if rspn_pagosnet['status'].to_i.zero?
-          debugger
           if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
             @order.temporary_address = !params[:save_user_address]
             @order.payments.last.started_processing
@@ -32,7 +31,11 @@ module Spree
             else
               @order.completed_at = Time.new.zone
               @order.save!
-              redirect_to completion_route
+              if @type_pagos_net==2
+                redirect_to '/spree/pagos_net/credit_card'
+              else
+                redirect_to completion_route
+              end
             end
           else
             render :edit
