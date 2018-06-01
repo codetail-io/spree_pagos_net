@@ -13,4 +13,5 @@ Rails.application.routes.draw do
   end
   get '/tushop_webservice/action.WSDL', to: redirect('/tushop_webservice/action')
   wash_out :tushop_webservice
+  get '/spree/pagos_net/credit_card', to: "pagos_net#credit_card", as: :credit_card
 end
