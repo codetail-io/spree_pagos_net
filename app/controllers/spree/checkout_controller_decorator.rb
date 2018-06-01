@@ -5,7 +5,9 @@ module Spree
     before_action :set_payment_method_net, only: [:update]
 
     def update
+      @message_pn = nil
       if @type_pagos_net
+
         pagos_net = PagosNet.new(@payment_method_p.id)
         user = { 'id' => @order.user.id,
                  'fiscal_name' => params['name_invoice'],
@@ -19,6 +21,7 @@ module Spree
                           'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
+        @message_pn = rspn_pagosnet['message']
         if rspn_pagosnet['status'].to_i.zero?
           @order.pagos_net_bill.create(transaction_id: rspn_pagosnet['id_transaccion'],
                                        code_recaudacion: @order.number,
@@ -36,7 +39,7 @@ module Spree
             else
               @order.completed_at = Time.new.zone
               @order.save!
-              if @type_pagos_net==2
+              if @type_pagos_net == 2
                 redirect_to '/spree/pagos_net/credit_card'
               else
                 redirect_to completion_route
@@ -45,6 +48,8 @@ module Spree
           else
             render :edit
           end
+        else
+          render :edit
         end
       else
         if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
