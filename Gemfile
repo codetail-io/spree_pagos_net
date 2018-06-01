@@ -7,5 +7,4 @@ gem 'rails-controller-testing'
 gem 'savon', '~> 2.12.0'
 gem 'spree', github: 'spree/spree', branch: 'master'
 gem 'spree_auth_devise', github: 'spree/spree_auth_devise', branch: 'master'
-gem 'wash_out', github: 'codetail-io/wash_out'
 gemspec

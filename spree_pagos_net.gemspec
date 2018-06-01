@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'spree_core', '>= 3.1.0', '< 4.0'
   s.add_dependency 'spree_extension'
   s.add_dependency 'savon', '~> 2.12.0'
-  s.add_dependency 'wash_out'
+  s.add_dependency 'wash-out', '0.10.1'
 
   s.add_development_dependency 'capybara'
   s.add_development_dependency 'capybara-screenshot'
