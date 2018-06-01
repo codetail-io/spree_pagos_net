@@ -20,6 +20,11 @@ module Spree
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
         logger.info(rspn_pagosnet)
         if rspn_pagosnet['status'].to_i.zero?
+          @order.pagos_net_bill.create(transaction_id: rspn_pagosnet['id_transaccion'],
+                                       code_recaudacion: @order.number,
+                                       nombre_facturar: user['fiscal_name'],
+                                       nit_facturar: user['ci'],
+                                       status: 'processing')
           if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
             @order.temporary_address = !params[:save_user_address]
             @order.payments.last.started_processing
