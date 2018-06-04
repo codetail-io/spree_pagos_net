@@ -38,9 +38,11 @@ module Spree
               @order.save!
               if @type_pagos_net == 2
                 redirect_to controller: 'pagos_net', action: 'credit_card', id: @order.id
-              else
-                # redirect_to completion_route
+              elsif  @type_pagos_net == 1
                 redirect_to controller: 'pagos_net', action: 'cash_payment', id: @order.id
+              else
+                redirect_to controller: 'pagos_net', action: 'ebaking', id: @order.id
+                # redirect_to completion_route
               end
             end
           else
