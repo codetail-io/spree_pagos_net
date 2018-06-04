@@ -7,16 +7,13 @@ module Spree
     def update
       @message_pn = nil
       if @type_pagos_net
-
+        (@type_pagos_net = '3') if !Rails.env.production? && @type_pagos_net == '2'
         pagos_net = PagosNet.new(@payment_method_p.id)
         user = { 'id' => @order.user.id,
                  'fiscal_name' => params['name_invoice'],
                  'ci' => params['ci_invoice'],
                  'email' => "user_ts_#{@order.user.id}@gmail.com" }
-        rspn = pagos_net.create_transaction(@order.number,
-                                            @order.total,
-                                            user,
-                                            @type_pagos_net)
+        rspn = pagos_net.create_transaction(@order.number, @order.total, user, @type_pagos_net)
         rspn_pagosnet = { 'status' => rspn.body[:registro_plan_response][:return][:codigo_error],
                           'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
