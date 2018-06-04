@@ -1,4 +1,4 @@
-class PagosnetCreditcard
+class PagosnetCreditCard
 
   def self.generate_iframe_pagosnet_creditcard(code_transaction, url_return = nil)
     red_url = url_return

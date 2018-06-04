@@ -17,13 +17,20 @@
         <%= radio_button_tag "type_pagos_net", 'ebaking' %> E-baking
       </label>
     </div>
-    <label>
-      Nombre a facturar:<%= text_field_tag "name_invoice", "" %>
-
-    </label>
-    <label>
-      NIT/CI: <%= text_field_tag "ci_invoice", "" %>
-    </label>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label for="card_name" class="control-label col-md-3"> Nombre a facturar:</label>
+        <div class="col-md-9">
+          <%= text_field_tag "name_invoice", "", required: true, id: 'card_name', class: 'form-control' %>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="nit_ci" class="control-label col-md-3">NIT/CI:</label>
+        <div class="col-md-9">
+          <%= text_field_tag "ci_invoice", "", required: true, id: 'nit_ci', class: 'form-control' %>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>

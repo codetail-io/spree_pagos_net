@@ -7,7 +7,11 @@ module Spree
     end
 
     def cash_payment
-      render 'spree/pagos_net/cash_payment' if @order
+      if @order
+        @pnb = @order.pagos_net_bills
+        render 'spree/pagos_net/cash_payment'
+      end
+
     end
 
     private
