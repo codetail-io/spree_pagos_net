@@ -1,17 +1,18 @@
 module Spree
   class PagosNetController < Spree::OrdersController
-    before_action :set_order, only: [:credit_card]
+    before_action :set_order, only: [:credit_card, :cash_payment, :ebaking]
 
     def credit_card
       render 'spree/pagos_net/credit_card' if @order
     end
 
     def cash_payment
-      if @order
-        @pnb = @order.pagos_net_bills
-        render 'spree/pagos_net/cash_payment'
-      end
+      render 'spree/pagos_net/cash_payment' if @order
 
+    end
+
+    def ebaking
+      render 'spree/pagos_net/ebaking' if @order
     end
 
     private
