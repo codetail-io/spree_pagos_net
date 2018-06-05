@@ -6,7 +6,7 @@ module Spree
       if @order
         @pagos_net_bill = @order.pagos_net_bill
         @pagos_net = PagosNet.new(@order.payments.last.payment_method.id)
-        @url_iframe = @pagos_net.credit_card_url_iframe(@order.number)
+        @url_iframe = @pagos_net.credit_card_url_iframe(@pagos_net_bill.transaction_id)
         render 'spree/pagos_net/credit_card'
       end
     end

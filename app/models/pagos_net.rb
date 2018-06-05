@@ -271,14 +271,14 @@ class PagosNet
     { plaintext: plaintext, key: key, msg_aes: msg_aes, key_crypt: key_crypt }
   end
 
-  def credit_card_url_iframe(order_number)
+  def credit_card_url_iframe(transaction_id)
 
     red_url = if Rails.env.production?
                 'https://www.tushopbolivia.com'
               else
                 'http://localhost:3000'
               end
-    data_encrypted = self.credit_card_encrypted(order_number)
-    @card_url + "?entidad=#{@card_entity}&ref=#{data_encrypted}&red=#{red_url}"
+    # data_encrypted = self.credit_card_encrypted(order_number)
+    @card_url + "?entidad=#{@card_entity}&ref=#{transaction_id}&red=#{red_url}"
   end
 end
