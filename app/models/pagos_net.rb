@@ -28,6 +28,10 @@ class PagosNet
     @user_name_pagos_net = payment_method['preferences'][:account_pagos_net] rescue ''
     @password_pagos_net = payment_method['preferences'][:password_pagos_net] rescue ''
     @soap_url = payment_method['preferences'][:soap_url_pagos_net] rescue ''
+    @company_code = payment_method['preferences'][:company_code_pagos_net] rescue ''
+    @card_entity = payment_method['preferences'][:credit_card_entity] rescue ''
+    @card_url = payment_method['preferences'][:credit_card_pagos_net] rescue ''
+    @card_key = payment_method['preferences'][:credit_card_key_authenticate] rescue ''
   end
 
   def create_transaction(code_transaction, amount_money, user_data, type_pay, opts = {})
@@ -40,35 +44,36 @@ class PagosNet
     opts_final = OPTS_DEFAULT.merge(opts)
     {
       datos:
-      {
-        transaccion: opts_final['type_transaction'],
-        nombre_comprador: user_data['fiscal_name'],
-        documento_identidad_comprador: user_data['ci'],
-        codigo_comprador: user_data['id'],
-        fecha: Time.zone.now.strftime('%Y%m%d'),
-        hora: Time.zone.now.strftime('%H%M%S'),
-        correo_electronico: user_data['email'],
-        moneda: opts_final['currency'],
-        codigo_recaudacion: code_transaction,
-        descripcion_recaudacion: opts_final['description_recaudacion'],
-        fecha_vencimiento: 0,
-        hora_vencimiento: 0,
-        categoria_producto: type_pay,
-        precedencia_cobro: opts_final['precedencia_cobro'],
-        planillas:
         {
-          numero_pago: 1,
-          monto_pago: amount_money.to_f,
-          descripcion: 'Pedido de TuShop',
-          monto_credito_fiscal: amount_money.to_f,
-          nombre_factura: user_data['fiscal_name'],
-          nit_factura: user_data['ci']
-        }
-      },
+          transaccion: opts_final['type_transaction'],
+          nombre_comprador: user_data['fiscal_name'],
+          documento_identidad_comprador: user_data['ci'],
+          codigo_comprador: user_data['id'],
+          fecha: Time.zone.now.strftime('%Y%m%d'),
+          hora: Time.zone.now.strftime('%H%M%S'),
+          correo_electronico: user_data['email'],
+          moneda: opts_final['currency'],
+          codigo_recaudacion: code_transaction,
+          descripcion_recaudacion: opts_final['description_recaudacion'],
+          fecha_vencimiento: 0,
+          hora_vencimiento: 0,
+          categoria_producto: type_pay,
+          precedencia_cobro: opts_final['precedencia_cobro'],
+          planillas:
+            {
+              numero_pago: 1,
+              monto_pago: amount_money.to_f,
+              descripcion: 'Pedido de TuShop',
+              monto_credito_fiscal: amount_money.to_f,
+              nombre_factura: user_data['fiscal_name'],
+              nit_factura: user_data['ci']
+            }
+        },
       cuenta: @user_name_pagos_net,
       password: @password_pagos_net
     }
   end
+
   # __________ end
 
   # def send_request_pagosnet(id_before_recaudacion = nil)
@@ -254,4 +259,24 @@ class PagosNet
   #
   #   return response
   # end
+
+  def credit_card(order_number)
+    plaintext = Digest::MD5.digest("cliente=#{@company_code}&entidad=#{@card_entity}&ref=#{order_number}")
+    key = Base64.decode64(@card_key)
+    cipher = OpenSSL::Cipher.new('AES-128-ECB')
+    cipher.encrypt
+    cipher.key = key
+    msg_aes = cipher.update(plaintext) + cipher.final
+    key_crypt = ERB::Util.url_encode(Base64.encode64(msg_aes))
+    { plaintext: plaintext, key: key, msg_aes: msg_aes, key_crypt: key_crypt }
+  end
+
+  def credit_card_url_iframe(order_number)
+    red_url = if Rails.env.production?
+                'https://www.tushopbolivia.com'
+              else
+                'http://localhost:3000'
+              end
+    @card_url + "?entidad=#{@card_entity}&ref=#{order_number}&red=#{red_url}"
+  end
 end

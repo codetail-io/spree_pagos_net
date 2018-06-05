@@ -3,16 +3,26 @@ module Spree
     before_action :set_order, only: [:credit_card, :cash_payment, :ebaking]
 
     def credit_card
-      render 'spree/pagos_net/credit_card' if @order
+      if @order
+        @pagos_net_bill = @order.pagos_net_bill
+        debugger
+        render 'spree/pagos_net/credit_card'
+      end
     end
 
-    def cash_payment
-      render 'spree/pagos_net/cash_payment' if @order
 
+    def cash_payment
+      if @order
+        @pagos_net_bill = @order.pagos_net_bill
+        render 'spree/pagos_net/cash_payment'
+      end
     end
 
     def ebaking
-      render 'spree/pagos_net/ebaking' if @order
+      if @order
+        @pagos_net_bill = @order.pagos_net_bill
+        render 'spree/pagos_net/ebaking'
+      end
     end
 
     private

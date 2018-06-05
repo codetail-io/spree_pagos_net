@@ -36,12 +36,10 @@ module Spree
             else
               @order.completed_at = Time.new.zone
               @order.save!
-              if @type_pagos_net == 2
+              if @type_pagos_net == 2 || @type_pagos_net == 3
                 redirect_to controller: 'pagos_net', action: 'credit_card', id: @order.id
-              elsif  @type_pagos_net == 1
-                redirect_to controller: 'pagos_net', action: 'cash_payment', id: @order.id
               else
-                redirect_to controller: 'pagos_net', action: 'ebaking', id: @order.id
+                redirect_to controller: 'pagos_net', action: 'cash_payment', id: @order.id
                 # redirect_to completion_route
               end
             end
