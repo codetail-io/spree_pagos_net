@@ -19,14 +19,14 @@ module Spree
         @order = Order.includes(line_items: [variant: [:option_values, :images, :product]],
                                 bill_address: :state, ship_address: :state)
                       .find_by!(number: @order_pn.number)
-        @pagos_net_bill = @order.pagos_net_bill
+        @pagos_net_bill = @order_pn.pagos_net_bill
         render 'spree/pagos_net/cash_payment'
       end
     end
 
     def ebaking
-      if @order
-        @pagos_net_bill = @order.pagos_net_bill
+      if @order_pn
+        @pagos_net_bill = @order_pn.pagos_net_bill
         render 'spree/pagos_net/ebaking'
       end
     end
