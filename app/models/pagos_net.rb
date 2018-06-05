@@ -260,7 +260,7 @@ class PagosNet
   #   return response
   # end
 
-  def credit_card(order_number)
+  def credit_card_encrypted(order_number)
     plaintext = Digest::MD5.digest("cliente=#{@company_code}&entidad=#{@card_entity}&ref=#{order_number}")
     key = Base64.decode64(@card_key)
     cipher = OpenSSL::Cipher.new('AES-128-ECB')
@@ -272,11 +272,13 @@ class PagosNet
   end
 
   def credit_card_url_iframe(order_number)
+
     red_url = if Rails.env.production?
                 'https://www.tushopbolivia.com'
               else
                 'http://localhost:3000'
               end
-    @card_url + "?entidad=#{@card_entity}&ref=#{order_number}&red=#{red_url}"
+    data_encrypted = self.credit_card_encrypted(order_number)
+    @card_url + "?entidad=#{@card_entity}&ref=#{data_encrypted}&red=#{red_url}"
   end
 end

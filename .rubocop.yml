@@ -72,3 +72,6 @@ Style/RescueModifier:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
+Metrics/BlockNesting:
+  Enabled: true
+  Max: 6
