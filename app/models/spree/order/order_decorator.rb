@@ -15,6 +15,6 @@ Spree::Order.class_eval do
     else
       self.pagos_net_bill = PagosNetBill.create(data_pagosnet.merge(status: 'paid_out'))
     end
-    self.payments.last.next
+    self.next
   end
 end
