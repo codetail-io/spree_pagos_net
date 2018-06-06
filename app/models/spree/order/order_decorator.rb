@@ -1,6 +1,7 @@
 Spree::Order.class_eval do
   has_one :pagos_net_bill,
           class_name: 'PagosNetBill', foreign_key: 'order_id'
+
   def self.find_payment_recaudacion(code_recaudacion)
     find_by(number: code_recaudacion)
   end
@@ -15,6 +16,10 @@ Spree::Order.class_eval do
     else
       self.pagos_net_bill = PagosNetBill.create(data_pagosnet.merge(status: 'paid_out'))
     end
-    self.next
+    payment = self.payments.last
+    if payment.processing?
+      payment.complete!
+      self.next!
+    end
   end
 end

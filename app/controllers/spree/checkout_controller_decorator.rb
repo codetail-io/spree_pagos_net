@@ -27,15 +27,15 @@ module Spree
                                                       status: 'processing')
           if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
             @order.temporary_address = !params[:save_user_address]
-            @order.payments.last.started_processing
+            @order.payments.last.started_processing!
+            payment_state = @order.payments.last.state
             if @order.completed?
               @current_order = nil
               flash.notice = Spree.t(:order_processed_successfully)
               flash['order_completed'] = true
               redirect_to completion_route
             else
-              @order.completed_at = Time.new.zone
-              @order.save!
+              @order.update_columns(payment_state: payment_state, completed_at: Time.current)
               if @type_pagos_net.to_i == 2 || @type_pagos_net.to_i == 3
                 redirect_to controller: 'pagos_net', action: 'credit_card', id: @order.id
               else
