@@ -43,15 +43,15 @@ class TushopWebserviceController < ApplicationController
 
   soap_action 'datosTransaccion',
               args: {
-                  'Datos' => WsTransaccion,
-                  'User' => :string,
-                  'Password' => :string
+                datos: WsTransaccion,
+                user: :string,
+                password: :string
               },
               return: {
-                  RespTransaccion: {
-                      CodError: :integer,
-                      Descripcion: :string
-                  }
+                RespTransaccion: {
+                  CodError: :integer,
+                  Descripcion: :string
+                }
               },
               to: :datos_transaccion
 
