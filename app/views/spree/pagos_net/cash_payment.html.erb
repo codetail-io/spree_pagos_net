@@ -1,14 +1,21 @@
-<div>
-  <h1><%= accurate_title %></h1>
-  <div>
-    <div class="col-lg-3">
-      Codigo de recaudación:
+<div class="panel panel-default">
+  <div class="panel-body">
+  <h1 class="text-center text-success"><%= accurate_title %></h1>
+  <div class="panel panel-default">
+  <div class="panel-body ">
+  <div class="row ">
+    <div class="col-sm-6">
+      <h3 class="text-primary">Codigo recaudación:</h3>
     </div>
-    <div class="col-lg-9">
-      <%= @pagos_net_bill.code_recaudacion %>
+    <div class="col-sm-6">
+      <h2 class="text-danger warning"><%= @pagos_net_bill.code_recaudacion %></h2>
     </div>
   </div>
-  <div id="order" data-hook>
+  </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+    <div id="order" data-hook>
     <%= render partial: 'spree/shared/order_details', locals: { order: @order } %>
     <br class="clear"/>
     <p data-hook="links">
@@ -19,6 +26,10 @@
         <% end %>
       <% end %>
     </p>
+  </div>
+    </div>
+  </div>
+
   </div>
 </div>
 

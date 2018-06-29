@@ -17,8 +17,14 @@ module Spree
         rspn_pagosnet = { 'status' => rspn.body[:registro_plan_response][:return][:codigo_error],
                           'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
+        if Rails.env.development?
+          rspn_pagosnet = { 'status' => '0',
+                            'message' => 'Validado hard core',
+                            'id_transaccion' => @order.number + '_transaction' }
+        end
         logger.info(rspn_pagosnet)
         @message_pn = rspn_pagosnet['message']
+        debugger
         if rspn_pagosnet['status'].to_i.zero?
           @order.pagos_net_bill = PagosNetBill.create(transaction_id: rspn_pagosnet['id_transaccion'],
                                                       code_recaudacion: @order.number,
