@@ -21,7 +21,8 @@ class PagosNet
                    'currency' => 'BS',
                    'description_recaudacion' => 'Pagar via pagos net',
                    'precedencia_cobro' => 'T',
-                   'description_planilla' => 'planilla 1' }
+                   'description_planilla' => 'planilla 1',
+                   'numero_pago' => '1' }
 
   def initialize(payment_method_id = nil)
     payment_method = Spree::PaymentMethod.find(payment_method_id)
@@ -37,7 +38,7 @@ class PagosNet
   def create_transaction(code_transaction, amount_money, user_data, type_pay, opts = {})
     params = prepare_payment_params(code_transaction, amount_money, user_data, type_pay, opts)
     client = Savon.client(wsdl: @soap_url)
-    resp_registro_plan = client.call(:registro_plan, message: params)
+    client.call(:registro_plan, message: params)
   end
 
   def prepare_payment_params(code_transaction, amount_money, user_data, type_pay, opts)
@@ -61,7 +62,7 @@ class PagosNet
           precedencia_cobro: opts_final['precedencia_cobro'],
           planillas:
             {
-              numero_pago: 1,
+              numero_pago: opts_final['numero_pago'],
               monto_pago: amount_money.to_f,
               descripcion: 'Pedido de TuShop',
               monto_credito_fiscal: amount_money.to_f,
@@ -72,6 +73,21 @@ class PagosNet
       cuenta: @user_name_pagos_net,
       password: @password_pagos_net
     }
+  end
+
+  def create_items_description(transaction_id, items_params, opts = {})
+    client = Savon.client(wsdl: @soap_url)
+    opts_final = OPTS_DEFAULT.merge(opts)
+
+    client.call(:registro_item,
+                message: {
+                  datos: { transaccion: opts_final['type_transaction'],
+                           id_transaccion: transaction_id,
+                           numero_pago: opts_final['numero_pago'],
+                           items: items_params },
+                  cuenta: @user_name_pagos_net,
+                  password: @password_pagos_net
+                })
   end
 
   # __________ end
