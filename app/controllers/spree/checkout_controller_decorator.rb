@@ -17,11 +17,11 @@ module Spree
         rspn_pagosnet = { 'status' => rspn.body[:registro_plan_response][:return][:codigo_error],
                           'message' => rspn.body[:registro_plan_response][:return][:descripcion_error],
                           'id_transaccion' => rspn.body[:registro_plan_response][:return][:id_transaccion] }
-        if Rails.env.development? && !rspn_pagosnet['status'].to_i.zero?
-          rspn_pagosnet = { 'status' => '0',
-                            'message' => 'Validado hard core',
-                            'id_transaccion' => @order.number + '_transaction' }
-        end
+        # if Rails.env.development? && !rspn_pagosnet['status'].to_i.zero?
+        #   rspn_pagosnet = { 'status' => '0',
+        #                     'message' => 'Validado hard core',
+        #                     'id_transaccion' => @order.number + '_transaction' }
+        # end
         @message_pn = rspn_pagosnet['message']
         if rspn_pagosnet['status'].to_i.zero?
           # save calculator-line-tushop of products
