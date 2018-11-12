@@ -84,7 +84,7 @@ class TushopWebserviceController < ApplicationController
                  nombre_facturar: (params[:datos][:NombreFacturar].to_s rescue nil) }
         ########################### REALIZAR EL PAGO
         if params[:datos][:Transaccion].to_s.upcase == TRANSACCION_PAGAR
-          if order.can_complete?
+          if order.payment?
             order.complete_pagosnet(data)
             render soap: { RespTransaccion: { CodError: '0',
                                               Descripcion: RESPONSE_MESSAGE[0] } }
