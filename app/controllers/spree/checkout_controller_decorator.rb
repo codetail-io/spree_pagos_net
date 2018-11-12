@@ -23,7 +23,6 @@ module Spree
         #                     'id_transaccion' => @order.number + '_transaction' }
         # end
         @message_pn = rspn_pagosnet['message']
-        @order.payments.last.started_processing!
         if rspn_pagosnet['status'].to_i.zero?
           # save calculator-line-tushop of products
           @order.save_calculator_line_tushop
@@ -39,6 +38,7 @@ module Spree
           #
           if @order.update_from_params(params, permitted_checkout_attributes, request.headers.env)
             @order.temporary_address = !params[:save_user_address]
+            @order.payments.last.started_processing!
             @order.payments.last.pend
             payment_state = @order.payments.last.state
             if @order.completed?
