@@ -17,9 +17,10 @@ Spree::Order.class_eval do
       self.pagos_net_bill = PagosNetBill.create(data_pagosnet.merge(status: 'paid_out'))
     end
     payment = self.payments.last
-    if payment.processing?
+    if payment.pending?
       payment.complete!
       self.next!
+      self.update(shipment_state: 'pending')
     end
   end
 
